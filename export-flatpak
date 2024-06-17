@@ -1,0 +1,40 @@
+#!/bin/python3
+
+import json
+import os
+import sys
+
+if len(sys.argv) < 2:
+    print("ERR: Invalid ussage.\n  export-flatpak <manifest>")
+    exit(1)
+
+filename = os.path.expanduser(sys.argv[1])
+
+cmd = f"flatpak-builder --force-clean --gpg-sign=D7ADD2A16AFB9306DE9D5D97791D3A9EFB147882 --repo=repo --state-dir=.flatpak-builder build-dir {filename}"
+
+print(f"Running: {cmd}")
+
+if os.system(cmd) != 0: exit(1)
+
+with open(filename) as f:
+    man = json.load(f)
+
+generate_flatpak_ref = input("Generate FlatpakRef? (Y/N): ") in ["Y", "y"]
+if not generate_flatpak_ref: exit(0)
+
+app_id = man['id'] if 'id' in man else man['app-id']
+app_name = input('Enter App Name: ')
+runtime = man['runtime']
+runtime_version = man['runtime-version']
+
+if runtime != "org.gnome.Platform": runtime_url = input("Enter Runtime Repository URL: ")
+elif runtime_version == "master": runtime_url = "https://nightly.gnome.org/gnome-nightly.flatpakrepo"
+else: runtime_url = "https://dl.flathub.org/repo/flathub.flatpakrepo"
+
+with open("flatpakref.format") as f:
+    flatpak_format_ref = f.read()
+
+flatpak_ref = flatpak_format_ref.replace("$0", app_id).replace("$1", app_name).replace("$2", runtime_url)
+
+with open(f"{app_id}.flatpakref", "w") as f:
+    f.write(flatpak_ref)

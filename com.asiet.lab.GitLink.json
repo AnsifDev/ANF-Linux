@@ -1,0 +1,97 @@
+{
+    "id" : "com.asiet.lab.GitLink",
+    "runtime" : "org.gnome.Platform",
+    "runtime-version" : "master",
+    "sdk" : "org.gnome.Sdk",
+    "command" : "gitlink",
+    "finish-args" : [
+        "--share=network",
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=pulseaudio",
+        "--device=dri",
+        "--socket=wayland",
+        "--socket=ssh-auth",
+        "--filesystem=host"
+    ],
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Extension.vala",
+        "org.freedesktop.Sdk.Extension.blueprint"
+    ],
+    "build-options" : {
+        "append-path" : "/usr/lib/sdk/vala/bin:/usr/lib/sdk/blueprint/bin",
+        "prepend-ld-library-path" : "/usr/lib/sdk/vala/lib:/usr/lib/sdk/blueprint/lib"
+    },
+    "cleanup" : [
+        "/include",
+        "/lib/pkgconfig",
+        "/man",
+        "/share/doc",
+        "/share/gtk-doc",
+        "/share/man",
+        "/share/pkgconfig",
+        "/share/vala",
+        "*.la",
+        "*.a"
+    ],
+    "modules" : [
+        {
+            "name": "libportal-gtk4",
+            "buildsystem": "meson",
+            "config-opts" : [
+                "-Ddocs=false",
+                "-Dvapi=true",
+                "-Dintrospection=true"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/flatpak/libportal.git",
+                    "tag": "0.7.1"
+                }
+            ]
+        },
+        {
+            "name": "libgit2",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DUSE_SSH=exec",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DBUILD_CLI=OFF",
+                "-DBUILD_TESTS=OFF"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/libgit2/libgit2.git",
+                    "tag": "v1.8.1"
+                }
+            ]
+        },
+        {
+            "name": "libgit2-glib",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dssh=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/AnsifDev/Libgit2-glib.git",
+                    "branch": "master"
+                }
+            ]
+        },
+        {
+            "name" : "gitlink",
+            "builddir" : true,
+            "buildsystem" : "meson",
+            "sources" : [
+                {
+                    "type" : "git",
+                    "url" : "https://github.com/AnsifDev/GitLink.git"
+                }
+            ]
+        }
+    ]
+}
