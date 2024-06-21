@@ -1,0 +1,8 @@
+{
+    "files.watcherExclude": {
+        "**/.dart_tool": true,
+        ".flatpak/**": true,
+        "_build/**": true
+    },
+    "vala.languageServerPath": "${workspaceFolder}/.flatpak/vala-language-server.sh"
+}
